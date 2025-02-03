@@ -2,7 +2,7 @@ import axios from "axios";
 
 const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
-const SCOPE = "user-top-read"
+const SCOPE = "user-read-private user-read-email user-top-read"
 // exporting different functions to be used in the application.
 // so this getSpotifyAuthUrl function is needed 
 export const getSpotifyAuthUrl = async()=>{
@@ -13,12 +13,12 @@ export const getSpotifyAuthUrl = async()=>{
         }).join("")
     }
     const codeVerifier = generateRandomString(64); //generates a random string using the above logic
-    localStorage.setItem(codeVerifier)// sets the generated verifier in the browser's local memory
+    localStorage.setItem("code_verifier",codeVerifier)// sets the generated verifier in the browser's local memory
     // everything after this line is fucking difficult to understand so please bare with it. you've been warned. try not to touch the code below it might fucking break it.
     const hashed = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(codeVerifier)); //hashed the codeverifier using SHA256
     const codeChallenge = btoa(String.fromCharCode(...new Uint8Array(hashed))).replace(/\//g,"_").replace(/=+$/,""); //i somewhat know what the fuck this does but i couldnt've wrote it on my own yeah. it fucking takes our fucking hashed and then fucking
     //uses fucking btoa (a web api) to convert it into fucking b64 format and the fucking replace helps in making it url safe. this is the part of the fucking PKCE auth flow so gotta get this fucking done.
-    const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${SCOPES}&code_challenge_method=S256&code_challenge=${codeChallenge}`;// puts the things in the thingy.
+    const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${SCOPE}&code_challenge_method=S256&code_challenge=${codeChallenge}`;// puts the things in the thingy.
     return authUrl; //returns this final fucking abomination of the url it created.
 }
 
@@ -31,7 +31,11 @@ export const getAccessToken = async (code)=>{
         code,// i am not completely sure but i think this when the user logins, it has that auth code.
         redirect_uri: REDIRECT_URI, // redirects to our page
         code_verifier: codeVerifier,// to check if the request was from our client only and not some random ahh dev sending them request.
-    }));
+    }),{
+        headers:{
+            "Content-Type":"application/x-www-form-urlencoded"
+        }
+    });
     return response.data.access_token; // accesses the response and particularly the access tokens there are other fields aswell.
 };
 // we tryna get the top tracks of the the user using the token we got.
