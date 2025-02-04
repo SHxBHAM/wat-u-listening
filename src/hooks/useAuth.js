@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { getAccessToken } from "../api/spotify";
 const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
 
 const useAuth = () => {
   const [token, setToken] = useState(localStorage.getItem("spotify_token"));

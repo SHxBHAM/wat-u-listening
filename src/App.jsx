@@ -3,11 +3,9 @@ import useAuth from "./hooks/useAuth";
 import useSpotifyData from "./hooks/useSpotifyData";
 import { redirectToAuthCodeFlow } from "./api/spotify";
 import TrackCard from "./components/TrackCard";
-import "./global.css";
 
 const Home = () => {
   const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-  const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
   const SCOPE = "user-read-private user-read-email user-top-read"
   const { token } = useAuth();
   const { topTracks } = useSpotifyData(token);
@@ -28,7 +26,7 @@ const Home = () => {
       ) : (
         <div>
           <h2>Your Top Tracks</h2>
-          <div className = "px-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className = "bg-gray-200 opacity-30 grid grid-cols-6 grid-rows-6 gap-4">
             {topTracks.map((topTracks) => (
               <TrackCard  key={topTracks.id} track={topTracks} />
             ))}
