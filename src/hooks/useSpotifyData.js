@@ -11,7 +11,7 @@ const useSpotifyData = (token) => {
         .catch((err) => console.error(err));
     }
   }, [token]);
-
+  // console.log(topTracks)
   return { topTracks };
 };
 

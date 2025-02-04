@@ -1,18 +1,20 @@
 import { useState } from "react";
 import useAuth from "./hooks/useAuth";
 import useSpotifyData from "./hooks/useSpotifyData";
-import { getSpotifyAuthUrl } from "./api/spotify";
-import TrackCard from "./components/TrackCard";
+import { redirectToAuthCodeFlow } from "./api/spotify";
+import TrackCard from "./components/trackCard";
 
-const App = () => {
+const Home = () => {
+  const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+  const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
+  const SCOPE = "user-read-private user-read-email user-top-read"
   const { token } = useAuth();
   const { topTracks } = useSpotifyData(token);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     setLoading(true);
-    const authUrl = await getSpotifyAuthUrl();
-    window.location.href = authUrl;
+    await redirectToAuthCodeFlow(CLIENT_ID);
   };
 
   return (
@@ -26,8 +28,8 @@ const App = () => {
         <div>
           <h2>Your Top Tracks</h2>
           <div className="track-list">
-            {topTracks.map((track) => (
-              <TrackCard key={track.id} track={track} />
+            {topTracks.map((topTracks) => (
+              <TrackCard key={topTracks.id} track={topTracks} />
             ))}
           </div>
         </div>
@@ -36,4 +38,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Home;
